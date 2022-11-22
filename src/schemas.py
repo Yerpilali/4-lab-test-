@@ -17,7 +17,7 @@ class BookCreate(BookBase):
 
 class Book(BookBase):
     id: int
-    publishings_id: int
+    publishing_id: int
 
     class Config:
         orm_mode = True
@@ -26,7 +26,7 @@ class Book(BookBase):
 class ReaderBase(BaseModel):
 
     name: str
-    telephone: int
+    telephone: str
     address: str
 
 
@@ -38,7 +38,6 @@ class ReaderCreate(ReaderBase):
 class Reader(ReaderBase):
 
     id: int
-    #book: list[Book]=[]
 
     class Config:
 
@@ -46,7 +45,6 @@ class Reader(ReaderBase):
 
 
 class PublishingBase(BaseModel):
-
 
     name: str
     city: str
@@ -61,7 +59,6 @@ class Publishing(PublishingBase):
 
     id: int
 
-
     class Config:
 
         orm_mode = True
@@ -69,10 +66,9 @@ class Publishing(PublishingBase):
 
 class GivingBase(BaseModel):
 
-    readers_id: int
-    books_id: int
-    data: date
-
+    reader_id: int
+    book_id: int
+    date: date
 
 
 class GivingCreate(GivingBase):
@@ -81,7 +77,7 @@ class GivingCreate(GivingBase):
 
 class Giving(GivingBase):
     id: int
-    list: str
+    mark: str
 
     class Config:
         orm_mode = True

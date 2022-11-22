@@ -1,7 +1,7 @@
 """empty message
 Revision ID: afile
-Revises: a19adff4a8fd
-Create Date: 2022-11-20 22:18:26.762949
+Revises: 15fb78103251
+Create Date: 2022-11-21 15:488:02.606415
 """
 from alembic import op
 from sqlalchemy.orm import Session
@@ -10,7 +10,7 @@ from datetime import datetime
 from src.models import Book, Giving, Reader, Publishing
 
 revision = 'afile'
-down_revision = 'a19adff4a8fd'
+down_revision = '15fb78103251'
 branch_labels = None
 depends_on = None
 
@@ -35,7 +35,10 @@ def upgrade() -> None:
     session.add_all([publ_a,publ_b])
     session.flush()
 
-    giv_a = Giving(list= 'dfdf')
-    giv_b = Giving(list='asa')
+    giv_a = Giving(mark= 'dfdf')
+    giv_b = Giving(mark='asa')
     session.add_all([giv_a,giv_b])
     session.flush()
+
+def downgrade() -> None:
+    pass

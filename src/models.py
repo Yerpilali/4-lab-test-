@@ -14,43 +14,38 @@ class BaseModel(Base):
 
 
 class Reader(BaseModel):
-    __tablename__ = "readers"
-
+    __tablename__ = "reader"
     name = Column(String)
     telephone = Column(String)
     address = Column(String)
-    # books = relationship("Books", back_populates="readers")
-    # givings = relationship("Givings", back_populates="readers")
+    giving = relationship("Giving", back_populates="reader")
 
 
 class Book(BaseModel):
-    __tablename__ = "books"
-
+    __tablename__ = "book"
     name = Column(String)
     author = Column(String)
     year = Column(Integer)
     price = Column(Integer)
     quantity = Column(Integer)
-    publishings_id = Column(Integer, ForeignKey("publishings.id"))
-    # publishings = relationship("Publishings", back_populates="books")
-    # readers = relationship("Readers", back_populates="books")
+    publishing_id = Column(Integer, ForeignKey("publishing.id"))
+    publishing = relationship("Publishing", back_populates="book")
+    giving = relationship("Giving", back_populates="book")
+
 
 class Publishing(BaseModel):
-    __tablename__ = "publishings"
-
+    __tablename__ = "publishing"
     name = Column(String)
     city = Column(String)
-
-    # books = relationship("Books", back_populates="publishings")
+    book = relationship("Book", back_populates="publishing")
 
 
 class Giving(BaseModel):
-    __tablename__ = "givings"
-
-    readers_id = Column(Integer, ForeignKey("readers.id"))
-    books_id = Column(Integer, ForeignKey("books.id"))
-    data = Column(Date)
-    list = Column(String)
-
-    # readers = relationship("Readers", back_populates="givings")
+    __tablename__ = "giving"
+    date = Column(Date)
+    mark = Column(String)
+    reader_id = Column(Integer, ForeignKey("reader.id"))
+    book_id = Column(Integer, ForeignKey("book.id"))
+    reader = relationship("Reader", back_populates="giving")
+    book = relationship("Book", back_populates="giving")
 

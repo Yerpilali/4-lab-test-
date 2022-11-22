@@ -22,19 +22,21 @@ def get_readers(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Reader).offset(skip).limit(limit).all()
 
 
-def update_product_amount(db:Session, giving_id: int, product_amount: int):
-    db_book = get_book_by_id(db=db, giving_id=giving_id)
+def update_product_amount(db:Session, book_id: int, product_amount: int):
+    db_book = get_book_by_id(db=db, book_id=book_id)
     db_book.quantity += product_amount
     if db_book.quantity >= 0:
         db.commit()
     return db_book
 
 
-def get_book_by_id(db: Session, book_id:int):
+def get_book_by_id(db: Session, book_id: int):
+
     return db.query(models.Book).filter(models.Book.id == book_id).first()
 
 
 def get_giving_by_id(db: Session, giving_id: int):
+
     return db.query(models.Giving).filter(models.Giving.id == giving_id).first()
 
 
@@ -59,14 +61,15 @@ def get_books(db: Session, skip: int = 0, limit: int = 100):
 
 def create_giving(db: Session, giving: schemas.GivingCreate, readers_id: int, books_id: int):
 
-    date = datetime.now()
-    db_giving = models.Giving(date=date, list=models.Reader.name,  readers_id=readers_id, books_id=books_id)
-
+    # date = datetime.now()
     db_book = get_book_by_id(db=db, book_id=books_id)
+    db_reader = get_reader(db=db, reader_id=readers_id)
+    db_giving = models.Giving(date=giving.date, mark=db_reader.name, book_id=db_book.id, reader_id=db_reader.id)
+
     if 1 <= db_book.quantity:
         update_product_amount(db=db,
-                           giving_id=db_giving.books_id,
-                            product_amount=-1)
+                              book_id=db_giving.book_id,
+                              product_amount=-1)
 
     db.add(db_giving)
     db.commit()

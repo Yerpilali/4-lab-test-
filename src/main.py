@@ -2,7 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from src import crud, models, schemas
 from src.database import SessionLocal, engine
-
+from typing import List
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -21,39 +21,41 @@ def get_db():
         db.close()
 
 
-@app.post("/reader/", response_model=schemas.Reader)
+@app.post("/readers/", response_model=schemas.Reader)
 def create_reader(reader: schemas.ReaderCreate, db: Session = Depends(get_db)):
-    db_reader = crud.create_reader(db, name=reader.name, telephone=reader.telephone, address=reader.address)
+    db_reader = crud.create_reader(db, reader=reader)
     return db_reader
 
 
-@app.get("/readers/", response_model=schemas.Reader)
+@app.get("/readers/", response_model=List[schemas.Reader])
 def read_readers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     readers = crud.get_readers(db, skip=skip, limit=limit)
     return readers
 
 
-@app.get("/reader/{reader_id}", response_model=schemas.Reader)
+@app.get("/readers/{reader_id}", response_model=schemas.Reader)
 def read_reader(reader_id: int, db: Session = Depends(get_db)):
     db_reader = crud.get_reader(db, reader_id=reader_id)
     if db_reader is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_reader
 
-@app.get("/book/{book_id}", response_model=schemas.Book)
+
+@app.get("/books/{book_id}", response_model=schemas.Book)
 def read_book(book_id: int, db: Session = Depends(get_db)):
     db_book = crud.get_book(db, book_id=book_id)
     if db_book is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_book
 
-@app.post("/publishing/", response_model=schemas.Publishing)
+
+@app.post("/publishings/", response_model=schemas.Publishing)
 def create_publishing(publishing: schemas.PublishingCreate, db: Session = Depends(get_db)):
-    db_publishing = crud.create_publishing(db, name=publishing.name, city=publishing.city)
+    db_publishing = crud.create_publishing(db, publishing=publishing)
     return db_publishing
 
 
-@app.get("/publishings/", response_model=schemas.Publishing)
+@app.get("/publishings/", response_model=List[schemas.Publishing])
 def read_publishings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     publishings = crud.get_publishings(db, skip=skip, limit=limit)
     return publishings
@@ -67,10 +69,10 @@ def read_publishing(publishing_id: int, db: Session = Depends(get_db)):
     return db_publishing
 
 
-@app.post("/giving/", response_model=schemas.Giving)
+@app.post("/givings/", response_model=schemas.Giving)
 def create_giving(giving: schemas.Giving, reader_id: int, book_id: int, db: Session = Depends(get_db)):
     db_giving_reader = crud.get_reader(db, reader_id=reader_id)
-    db_giving_book = crud.get_book_by_id(db, book_id=book_id)
+    db_giving_book = crud.get_book(db, book_id=book_id)
     if not db_giving_reader:
         raise HTTPException(status_code=404, detail="Читателя с таким кодом не существует")
     if not db_giving_book:
@@ -78,7 +80,7 @@ def create_giving(giving: schemas.Giving, reader_id: int, book_id: int, db: Sess
     return crud.create_giving(db, giving=giving, readers_id=reader_id, books_id=book_id)
 
 
-@app.get("/givings/", response_model = schemas.Giving)
+@app.get("/givings/", response_model=List[schemas.Giving])
 def read_givings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     givings = crud.get_givings(db, skip=skip, limit=limit)
     return givings
@@ -92,11 +94,3 @@ def read_giving(giving_id: int, db: Session = Depends(get_db)):
     return db_giving
 
 
-@app.post('/giving/', response_model=schemas.Giving)
-def create_giving(giving: schemas.GivingCreate, readers_id: int, books_id: int, giving_id: int, db: Session = Depends(get_db)):
-    db_giving = crud.get_giving_by_id(db=db, giving_id=giving_id)
-    print(db_giving)
-    if db_giving is None:
-        db.delete()
-        raise HTTPException(status_code=422, detail='there is not enoough product')
-    return crud.create_giving(db, list=giving.list)
